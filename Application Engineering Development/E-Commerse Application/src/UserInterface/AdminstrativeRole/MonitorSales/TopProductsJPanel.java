@@ -1,0 +1,218 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package UserInterface.AdminstrativeRole.MonitorSales;
+
+import business.configuration.Business;
+import business.market.Market;
+import business.market.MarketOffer;
+import business.sales.Order;
+import business.sales.OrderItem;
+import business.sales.Person;
+import business.supplier.Product;
+import business.supplier.Supplier;
+import java.awt.CardLayout;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import javax.swing.JPanel;
+import javax.swing.table.DefaultTableModel;
+
+/**
+ *
+ * @author chava
+ */
+public class TopProductsJPanel extends javax.swing.JPanel {
+
+    /**
+     * Creates new form TopProductsJPanel
+     */
+    JPanel userProcessContainer;
+    Business business;
+
+    public TopProductsJPanel(JPanel userProcessContainer, Business business) {
+        initComponents();
+        this.business = business;
+        this.userProcessContainer = userProcessContainer;
+        populateMarketOffer();
+    }
+
+    public void populateMarketOffer() {
+        comboMarket.removeAllItems();
+        for (Market market : business.getMarketDirectory().getMarketList()) {
+            comboMarket.addItem(market);
+        }
+        populateOfferTable();
+    }
+
+    public void populateOfferTable() {
+        Market m = (Market) comboMarket.getSelectedItem();
+        ArrayList<Product> prd = new ArrayList<>();
+        for (Order order : business.getOrderDirectory().getOrderList()) {
+            if (order.getCustomer().getMarketName().equals(m.getMarketName())) {
+                for (OrderItem orderItem : order.getOrderItemList()) {
+                    prd.add(orderItem.getMarketOffer().getProduct());
+                }
+            }
+        }
+
+//            for (Product product : prd) { 
+//        for (Order order : business.getOrderDirectory().getOrderList()) {
+//            if(order.getCustomer().getMarketName().equals(m.getMarketName())){
+//                for (OrderItem orderItem : order.getOrderItemList()) {
+//                   if(orderItem.getMarketOffer().getProduct().equals(product)){
+//                       total= total+ orderItem.orderItemTotal();
+//                       target=target+orderItem.orderItemTargetTotal();
+//                   }
+//                }
+//            }
+//        
+//            }
+//               }
+        Collections.sort(prd, new Comparator<Product>() {
+            public int compare(Product p1, Product p2) {
+                double ftotal = 0;
+                double ftarget = 0;
+                for (Order order : business.getOrderDirectory().getOrderList()) {
+                    if (order.getCustomer().getMarketName().equals(m.getMarketName())) {
+                        for (OrderItem orderItem : order.getOrderItemList()) {
+                            if (orderItem.getMarketOffer().getProduct().equals(p1)) {
+                                ftotal = ftotal + orderItem.orderItemTotal();
+                                ftarget = ftarget + orderItem.orderItemTargetTotal();
+                            }
+                        }
+                    }
+
+                }
+
+                double stotal = 0;
+                double starget = 0;
+                for (Order order : business.getOrderDirectory().getOrderList()) {
+                    if (order.getCustomer().getMarketName().equals(m.getMarketName())) {
+                        for (OrderItem orderItem : order.getOrderItemList()) {
+                            if (orderItem.getMarketOffer().getProduct().equals(p2)) {
+                                stotal = stotal + orderItem.orderItemTotal();
+                                starget = starget + orderItem.orderItemTargetTotal();
+                            }
+                        }
+                    }
+
+                }
+                int x = (int) (ftarget - ftotal);
+                int y = (int) (starget - stotal);
+                return (x - y);
+
+            }
+        });
+        ArrayList<Product> tprd = new ArrayList<>();
+
+        int count = 0;
+        for (Product product : prd) {
+            tprd.add(product);
+            count++;
+            if (count == 3) {
+                break;
+            }
+        }
+
+        DefaultTableModel dtm = (DefaultTableModel) tblProd.getModel();
+        dtm.setRowCount(0);
+        for (Product product : tprd) {
+
+            Object[] row = new Object[4];
+            row[0] = product;
+            row[1] = product.getProductId();
+            row[2] = product.getPrice();
+            row[3] = product.getAvailQuantity();
+            dtm.addRow(row);
+
+        }
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        btnBack = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        comboMarket = new javax.swing.JComboBox();
+        jLabel1 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblProd = new javax.swing.JTable();
+
+        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        btnBack.setText("Back");
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
+            }
+        });
+        add(btnBack, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 360, -1, -1));
+
+        jLabel3.setFont(new java.awt.Font("Times New Roman", 0, 24)); // NOI18N
+        jLabel3.setText("TOP 3 PRODUCTS");
+        add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 70, 200, 30));
+
+        comboMarket.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboMarketActionPerformed(evt);
+            }
+        });
+        add(comboMarket, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 120, 180, 30));
+
+        jLabel1.setText("Market:");
+        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 120, 60, 30));
+
+        tblProd.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        tblProd.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Product Name", "Product ID", "Price", "AvailQuantity"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(tblProd);
+
+        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 170, 610, 170));
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+        // TODO add your handling code here:
+        userProcessContainer.remove(this);
+        CardLayout layout = (CardLayout) userProcessContainer.getLayout();
+        layout.previous(userProcessContainer);
+    }//GEN-LAST:event_btnBackActionPerformed
+
+    private void comboMarketActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboMarketActionPerformed
+        // TODO add your handling code here:
+
+        populateOfferTable();
+    }//GEN-LAST:event_comboMarketActionPerformed
+
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnBack;
+    private javax.swing.JComboBox comboMarket;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable tblProd;
+    // End of variables declaration//GEN-END:variables
+}
